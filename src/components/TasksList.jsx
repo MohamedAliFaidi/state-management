@@ -7,6 +7,10 @@ function TasksList() {
 
   useEffect(() => {
     setTasks(JSON?.parse(localStorage?.getItem("tasks")));
+    localStorage.setItem(
+      "count",
+      JSON?.parse(localStorage?.getItem("tasks"))?.length
+    );
   }, [del]);
 
   return (
