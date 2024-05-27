@@ -1,28 +1,22 @@
 import { useState } from "react";
 import "./task.css";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { markAsDone, deleteTodo } from "../redux/slices/todo.slice";
 
-function Task({ task, index, setDel, del }) {
+function Task({ task, index}) {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isDone,setIsDone]=useState(false)
-  const deleteTodo = () => {
-    const confirmed = confirm("are you sure you want to delete this todo ? ");
-    if (confirmed) {
-      const tasks = JSON.parse(localStorage.getItem("tasks"));
-      tasks.splice(index, 1);
-      localStorage.setItem("tasks", JSON.stringify(tasks));
-      setDel(!del);
-    }
-  };
 
   const onCheck = (e) => {
-    const tasks = JSON.parse(localStorage.getItem("tasks"));
-    console.log(e.target.checked)
-    tasks[index].done = e.target.checked;
-    setIsDone(e.target.checked)
-    tasks.splice(index, 1 , tasks[index]);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    setDel(!del);
+    dispatch(markAsDone({ id: index, done: e.target.checked }));
+  };
+
+  const onDelete = () => {
+    const confirmed = confirm("are you sure you want to delete this todo ? ");
+    if (confirmed) {
+      dispatch(deleteTodo({ id: index }));
+    }
   };
 
   return (
@@ -34,29 +28,29 @@ function Task({ task, index, setDel, del }) {
           <i className="fa fa-dribbble"></i>
         </a>
       </div>
-      <p>
-        <div className="card">
-          <div>Mark as done</div>
-          <input
-            onChange={onCheck}
-            placeholder="Done"
-            type="checkbox"
-            id="done"
-            name="done"
-            checked={task?.done}
-            disabled={task.done}
-          />
-        </div>
-        <br />
-        <button
-          onClick={() => {
-            navigate("/edit-todo/" + index);
-          }}
-        >
-          Edit
-        </button>
-        <button onClick={deleteTodo}>delete</button>
-      </p>
+
+      <div className="card">
+        <div>Mark as done</div>
+        <input
+          onChange={onCheck}
+          placeholder="Done"
+          type="checkbox"
+          id="done"
+          name="done"
+          checked={task?.done}
+          disabled={task.done}
+        />
+      </div>
+      <br />
+      <button
+        onClick={() => {
+          console.log(index);
+          navigate("/edit-todo/" + index);
+        }}
+      >
+        Edit
+      </button>
+      <button onClick={onDelete}>delete</button>
     </div>
   );
 }

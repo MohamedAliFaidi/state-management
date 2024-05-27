@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import "./navbar.css";
-import { useEffect, useState } from "react";
+
 function Navbar() {
-  const [count, SetCount] = useState(0);
-  useEffect(() => {
-    SetCount(localStorage.getItem("count"));
-  }, []);
+
+
+   
+
   return (
     <ul>
       <li>
@@ -19,7 +19,7 @@ function Navbar() {
         </Link>
       </li>
 
-      <li style={{ float: "right", color: "white" }}>There is {count} Todos</li>
+      <li style={{ float: "right", color: "white" }}>There is  Todos</li>
     </ul>
   );
 }

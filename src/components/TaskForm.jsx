@@ -2,35 +2,41 @@ import toast from "react-hot-toast";
 import "./form.css";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { submitAdd, submitEdit } from "../redux/slices/todo.slice";
 
 function TaskForm() {
+
+  const dispatch = useDispatch();
   const [isUpdate, setIsUpdate] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const tasks = useSelector(state=>{return state?.value})
   const [name, setName] = useState("");
   const [desription, setDescription] = useState("");
   const { id } = useParams();
 
+
+
   useEffect(() => {
+    console.log(tasks);
     if (location.pathname.split("/").includes("edit-todo")) {
       setIsUpdate(true);
-      const tasks = JSON.parse(localStorage.getItem("tasks"));
-      setName(tasks[id]["name"]);
-      setDescription(tasks[id]["description"]);
     } else {
       setIsUpdate(false);
     }
   }, [location.pathname]);
-  const submitAdd = (e) => {
-    e.preventDefault();
+  const Add = (e) => {
     try {
-      let tasks = JSON.parse(localStorage.getItem("tasks"));
-      tasks?.push({
-        name: e.target.name.value,
-        description: e.target.description.value,
-        done: false,
-      });
-      localStorage.setItem("tasks", JSON.stringify(tasks));
+      e.preventDefault();
+      dispatch(
+        submitAdd({
+          name: e.target.name.value,
+          description: e.target.description.value,
+          done: false,
+        })
+      );
+
       toast.success("To do Added");
       navigate("/");
     } catch (error) {
@@ -39,16 +45,17 @@ function TaskForm() {
     }
   };
 
-  const submitEdit = (e) => {
+  const Edit = (e) => {
     e.preventDefault();
     try {
-      let tasks = JSON.parse(localStorage.getItem("tasks"));
-      tasks.splice(id, 1, {
+      const body = {
         name: e.target.name.value,
         description: e.target.description.value,
         done: false,
-      });
-      localStorage.setItem("tasks", JSON.stringify(tasks));
+      };
+
+      dispatch(submitEdit({ id: id, body: body }));
+     
       toast.success("To do updated");
       navigate("/");
     } catch (error) {
@@ -58,13 +65,13 @@ function TaskForm() {
   };
 
   return (
-    <form onSubmit={isUpdate ? submitEdit : submitAdd} className="form-example">
+    <form onSubmit={isUpdate ? Edit : Add} className="form-example">
       {!isUpdate ? (
         <>
           {" "}
           <div className="form-example">
             <label htmlFor="name">Name: </label>
-            <input type="text" name="name" id="name" required />
+            <input  type="text" name="name" id="name" required />
           </div>
           <div className="form-example">
             <label htmlFor="description">Description: </label>
@@ -77,20 +84,18 @@ function TaskForm() {
             {" "}
             <label htmlFor="name">Name: </label>
             <input
-              value={name}
               onChange={(e) => {
                 setName(e.target.value);
               }}
               type="text"
               name="name"
               id="name"
-              required
+              value={tasks[id].name}
             />
           </div>
           <div className="form-example">
             <label htmlFor="description">Description: </label>
             <input
-              value={desription}
               onChange={(e) => {
                 setDescription(e.target.value);
               }}
